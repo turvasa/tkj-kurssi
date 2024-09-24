@@ -60,6 +60,7 @@
   "files.associations": {
     "stdio.h": "c",
     "inttypes.h": "c",
-    "math.h": "c"
+    "math.h": "c",
+    "cstdint": "c"
   }
 }
