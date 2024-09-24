@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <inttypes.h>
-#include <math.h>
 
-// Prototyyppi tähän
+
 float lampotila(uint16_t rekisteri);
 
 
@@ -11,15 +10,15 @@ int main() {
     uint16_t argumentti = 0b0011001000000000;
 
     tulos = lampotila(argumentti);
-    printf("{%f}",tulos);
+    printf("Tulos on: %f \n",tulos);
 
     return 0;
 }
 
-// Funktion toteutus tänne..
-// Prototyyppi tähän
-float lampotila(uint16_t rekisteri) {
-    uint16_t mask = fff101;
 
-    return (rekisteri | mask >> 2) * 0.03125;
+float lampotila(uint16_t rekisteri) {
+    int mask = 0xfffc; //fffc = 1111 1111 1111 1100
+    int temperature_bit = rekisteri & mask;
+
+    return (temperature_bit >> 2) * 0.03125;
 }
