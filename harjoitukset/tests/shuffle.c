@@ -67,7 +67,7 @@ void shuffle(uint8_t *list, uint16_t list_size) {
 
 void reorganize_list(uint8_t *list, uint16_t first_index, uint16_t list_size) {
     for (int i = first_index; i < list_size; i++) {
-        if (i == list_size)
+        if (i == list_size - 1)
             list[i] = 0;
         else
             list[i] = list[i+1];
