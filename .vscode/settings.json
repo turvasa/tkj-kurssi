@@ -62,5 +62,6 @@
     "inttypes.h": "c",
     "math.h": "c",
     "cstdint": "c"
-  }
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }
