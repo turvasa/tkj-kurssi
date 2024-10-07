@@ -6,7 +6,7 @@
 
 void print_list(uint8_t *list, uint16_t list_size);
 void shuffle(uint8_t *list, uint16_t list_size);
-void reorganize_list(uint8_t *list, uint16_t first_index, uint16_t list_size);
+void reorganize_list(uint8_t *list, uint16_t first_index, uint16_t list_size, uint8_t loop_count);
 
 
 
@@ -47,16 +47,12 @@ void print_list(uint8_t *list, uint16_t list_size) {
 
 
 void shuffle(uint8_t *list, uint16_t list_size) {
-    uint16_t shuffled_list[list_size];
+    uint8_t shuffled_list[list_size];
 
-    for (int i = list_size - 1; i >= 0; i--) {
-        if (i == 0) {
-            shuffled_list[i] = list[i];
-        } else {
-            int random_num = rand()%(i);
-            shuffled_list[i] = list[random_num];
-            reorganize_list(list, random_num, list_size);
-        }
+    for (uint8_t i = 0; i < list_size; i++) {
+        uint8_t random_num = rand()%(list_size - i);
+        shuffled_list[i] = list[random_num];
+        reorganize_list(list, random_num, list_size, i+2);
     }
 
     for (int j = 0; j < list_size; j++) {
@@ -65,11 +61,12 @@ void shuffle(uint8_t *list, uint16_t list_size) {
 }
 
 
-void reorganize_list(uint8_t *list, uint16_t first_index, uint16_t list_size) {
-    for (int i = first_index; i < list_size; i++) {
-        if (i == list_size - 1)
-            list[i] = 0;
-        else
-            list[i] = list[i+1];
+void reorganize_list(uint8_t *list, uint16_t first_index, uint16_t list_size, uint8_t loop_count) {
+    for (uint8_t i = first_index; i < list_size - 1; i++) {
+        list[i] = list[i+1];
+    }
+
+    for (uint8_t j = 1; j < loop_count; j++) {
+        list[list_size - j] = 0;
     }
 }
