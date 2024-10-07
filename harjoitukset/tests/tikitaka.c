@@ -77,21 +77,27 @@ int8_t tictactoe_check(int8_t* gameboard, int win_len) {
 
 
 bool row(int8_t* items, int win_len, int items_count, int side_len, uint8_t item_type) {
-    for (int i = 0; i < (items_count - win_len); i++) {
+    for (int i = 0; i <= (items_count - win_len); i++) {
         int8_t matchingItem_count = 1;
 
-        for (int j = 1; j <= win_len; j++) {
+        if (items[i] == item_type) {
+            for (int j = 1; j <= win_len; j++) {
 
-            //Does i+j go to next row
-            if ((i + j) % side_len == 0) break;
+                //Does i+j go to next row
+                if ((i + j) % side_len == 0) break;
 
-            else if (items[i] == items[i + j]) {
-                matchingItem_count ++;
+                else if (items[i] == items[i + j]) {
+                    matchingItem_count ++;
 
-            } else break;
+                } else break;
+            }
+
+            if (matchingItem_count >= win_len) {
+                return 1;
+            } else {
+                matchingItem_count = 1;
+            }
         }
-
-        if (matchingItem_count >= win_len) return 1;
     }
 
     return 0;
@@ -102,19 +108,21 @@ bool row(int8_t* items, int win_len, int items_count, int side_len, uint8_t item
 bool column(int8_t* items, int win_len, int items_count, int side_len, uint8_t item_type) {
     //No need to check last n (n = win_len - 1) rows in first for -loop, because
     //there can't found any more winnable combos
-    for (int i = 0; i < (items_count - (((win_len - 1)) * side_len)); i++) {
+    for (int i = 0; i <= (items_count - (((win_len - 1)) * side_len)); i++) {
         int8_t matchingItem_count = 1;
 
         if (items[i] == item_type) {
-            for (int factor = 1; factor <= win_len; factor++) {
+            for (int factor = 1; factor < win_len; factor++) {
 
                 if (items[i] == items[i + (side_len * factor)]) {
                     matchingItem_count ++;
                 } else break;
             }
 
-            if (matchingItem_count >= 4) {
+            if (matchingItem_count >= win_len) {
                 return 1;
+            } else {
+                matchingItem_count = 1;
             }
         }
     }
@@ -127,14 +135,14 @@ bool column(int8_t* items, int win_len, int items_count, int side_len, uint8_t i
 bool diagonal(int8_t* items, int win_len, int items_count, int side_len, uint8_t item_type) {
     //No need to check last n (n = win_len - 1) rows in first for -loop, because
     //there can't found any more winnable combos
-    for (int i = 0; i < (items_count - (((win_len - 1)) * side_len)); i++) {
+    for (int i = 0; i <= (items_count - (((win_len - 1)) * side_len)); i++) {
         int8_t matchingItem_count = 1;
 
         if (items[i] == item_type) {
 
             //Downward diagonal
             if ((i % side_len) < win_len) {
-                for (int factor = 1; factor <= win_len; factor++) {
+                for (int factor = 1; factor < win_len; factor++) {
 
                     if (items[i] == items[i + (side_len + 1) * factor]) {
                         matchingItem_count ++;
@@ -143,9 +151,9 @@ bool diagonal(int8_t* items, int win_len, int items_count, int side_len, uint8_t
                 }
             }
 
-            if (matchingItem_count >= 4) {
+            if (matchingItem_count >= win_len) {
                 return 1;
-            } else matchingItem_count = 0;
+            } else matchingItem_count = 1;
 
             //Upward diagonal
             if ((i % side_len) > (side_len - win_len)) {
@@ -158,8 +166,10 @@ bool diagonal(int8_t* items, int win_len, int items_count, int side_len, uint8_t
                 }
             }
 
-            if (matchingItem_count >= 4) {
+            if (matchingItem_count >= win_len) {
                 return 1;
+            } else {
+                matchingItem_count = 1;
             }
         }
     }
