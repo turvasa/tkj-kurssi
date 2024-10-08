@@ -13,15 +13,20 @@ void print_winner(int winner_int);
 
 
 int main() {
-    int8_t game_one[25] = {
-        1, 1, 1, 1, 0,
-        2, 1, 1, 2, 1,
-        2, 1, 1, 0, 0, 
-        0, 1, 2, 1, 2,
-        0, 0, 0, 1, 1
+    int8_t game_one[100] = {
+        0, 1, 2, 1, 0, 1, 0, 0, 0, 2,
+        0, 1, 1, 0, 0, 0, 0, 0, 2, 0,
+        0, 0, 1, 0, 0, 0, 0, 2, 0, 0,
+        0, 2, 2, 1, 2, 2, 2, 0, 0, 0,
+        0, 1, 0, 0, 0, 2, 0, 0, 0, 0,
+        0, 1, 1, 2, 2, 1, 2, 1, 0, 0,
+        0, 0, 0, 2, 0, 0, 1, 0, 0, 0,
+        0, 1, 2, 0, 0, 0, 0, 1, 0, 0,
+        0, 2, 0, 0, 0, 0, 0, 0, 1, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 1
     };
 
-    int winner_one = tictactoe_check(game_one, 4);
+    int winner_one = tictactoe_check(game_one, 9);
 
     print_winner(winner_one);    
 
@@ -31,6 +36,7 @@ int main() {
 
 
 void print_winner(int winner_int) {
+    printf("\n");
     if (winner_int == 0) {
         printf("Kumpikaan ei voittanut!\n");
     } else if (winner_int == 1) {
@@ -40,6 +46,7 @@ void print_winner(int winner_int) {
     } else {
         printf("Something went wrong\n");
     }
+    printf("\n");
 }
 
 
@@ -64,13 +71,14 @@ int8_t tictactoe_check(int8_t* gameboard, int win_len) {
         diagonal(gameboard, win_len, gameboard_size, gameboard_side, zero)
     );
 
-    if (x_wins && zero_wins) {
+    if (x_wins && zero_wins)
         return 0;
-    } else if (x_wins) {
+    
+    else if (x_wins)
         return 1;
-    } else if (zero_wins) {
+
+    else if (zero_wins)
         return 2;
-    }
 
     return 0;
 }
@@ -141,7 +149,7 @@ bool diagonal(int8_t* items, int win_len, int items_count, int side_len, uint8_t
         if (items[i] == item_type) {
 
             //Downward diagonal
-            if ((i % side_len) < win_len) {
+            if ((i % side_len) <= (side_len - win_len)) {
                 for (int factor = 1; factor < win_len; factor++) {
 
                     if (items[i] == items[i + (side_len + 1) * factor]) {
@@ -156,8 +164,8 @@ bool diagonal(int8_t* items, int win_len, int items_count, int side_len, uint8_t
             } else matchingItem_count = 1;
 
             //Upward diagonal
-            if ((i % side_len) > (side_len - win_len)) {
-                for (int factor = 1; factor <= win_len; factor++) {
+            if ((i % side_len) >= (win_len - 1)) {
+                for (int factor = 1; factor < win_len; factor++) {
 
                     if (items[i] == items[i + (side_len - 1) * factor]) {
                         matchingItem_count ++;
