@@ -8,7 +8,7 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/tatut/OneDrive/Työpöytä/Yliopisto/ohjelmointi/tkj/test",
+      "cwd": "C:/Users/tatut/OneDrive/Tiedostot/GitHub/tkj-kurssi/harjoitukset/tests",
       "program": "c:/Users/tatut/OneDrive/Työpöytä/Yliopisto/ohjelmointi/tkj/test/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
