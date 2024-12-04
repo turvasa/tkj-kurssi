@@ -1,4 +1,4 @@
-main:
+main:     # %rax = %rdi Ä %rsi
     irmovq $01,%r10     # Number 01
     loop:
         addq %rdi,%rax      # Adding rdi to final value rax

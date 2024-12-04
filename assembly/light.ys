@@ -1,0 +1,23 @@
+main:               # lightness = 0.01 * (light_1 ^ 2) * light_2
+    irmovq $0xf000,%r10     # mask_1 = f000
+    irmovq $0x0fff,%r11     # mask_2 = 0fff
+    andq %r11,%r13          # light_2 = register & mask_2
+    andq %r10,%r14          # light_1 = register & mask_1
+    rrmovq %r14,%rdi        # %rdi = light_1
+    irmovq $0x1000,%rsi     # %rsi = 1000
+    call division           # light_1 >> 12
+    rrmovq %rax,%r14        # light_1 = %rax
+
+
+
+division:           # %rax = %rdi / %rsi
+    irmovq $01,%r10     # Number 01
+    division_loop:      # loop
+        subq %rsi,%rdi      # If ((rdi - rsi) > 0)
+        jg add_count        #    Jump to add_count
+        jmp end_loop        # Jump to end_loop
+    add_count:          # add_count
+        addq %r10,%rax      # Count++
+        jmp division_loop   # Back to loop
+    end_loop:           # end_loop
+    ret                 # Return
