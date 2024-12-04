@@ -1,0 +1,26 @@
+main:
+    irmovq $00,%rdi     # Item Sum
+    irmovq $00,%rsi     # Item Count
+    irmovq $01,%r10     # Value 01
+    add:
+        popq %r9            # %r9 = Top item of stack
+        andq %r9,%r9         # If (%r9 == 0)
+        je end_add         #    End loop
+        addq %r9,%rdi       # ItemSum += %
+        addq %r10,%rsi      # Count++
+        jmp add
+    end_add:
+    call mean       # Calculate mean
+    halt
+
+mean:
+    irmovq $01,%r10     # Number 01
+    loop:               # loop
+        subq %rsi,%rdi      # If ((rdi - rsi) > 0)
+        jg add_count        #    Jump to add_count
+        jmp end_loop        # Jump to end_loop
+    add_count:          # add_count
+        addq %r10,%rax      # Count++
+        jmp loop            # Back to loop
+    end_loop:           # end_loop
+    ret                 # Return

@@ -1,6 +1,5 @@
 main:
-    irmovq taulukko,%rsp    # Initialize string
-    mrmovq (%rsp), %rsi     # Pointer to start of the str
+    irmovq taulukko,%rsi    # Initialize string
     irmovq $01,%r10         # Value 01
     irmovq $08,%r8          # Value 08 (64 bits = 8 bytes)
     loop:

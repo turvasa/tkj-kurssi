@@ -1,0 +1,22 @@
+main:
+    popq %r9            # r9 = Top value of stack
+    rrmovq %r9,%rdi     # %rdi = Max value
+    rrmovq %r9,%rsi     # %rsi = Min value
+    loop:
+        popq %r9            # %r9 = Top value of stack
+        andq %r9,%r9        # If (%r9 == 0)
+        je end_loop         #    End loop
+        rrmovq %r9,%r10     # %r10 = %r9
+        rrmovq %r9,%r11     # %r11 = %r9
+        subq %rdi,%r9       # If (%r9 > CurrentMax)
+        jg update_max       #    Jump to update_max
+        subq %rsi,%r10      # If (%r10 < currentMin)
+        jl update_min       #    Jump to update_min
+        jmp loop
+    update_max:
+        rrmovq %r11,%rdi     # Change new max 
+        jmp loop
+    update_min:
+        rrmovq %r11,%rsi     # Change new min 
+        jmp loop
+    end_loop:
