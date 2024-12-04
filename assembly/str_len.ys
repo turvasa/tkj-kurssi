@@ -1,0 +1,13 @@
+main:
+    irmovq taulukko,%rsp    # Initialize string
+    mrmovq (%rsp), %rsi     # Pointer to start of the str
+    irmovq $01,%r10         # Value 01
+    irmovq $08,%r8          # Value 08 (64 bits = 8 bytes)
+    loop:
+        mrmovq (%rsi), %rdi     # Get value of char
+        andq %rdi,%rdi          # If (value == 0)
+        je end_loop             #    end_loop
+        addq %r10,%rax          # count++
+        addq %r8,%rsi           # Move to next char
+        jmp loop
+    end_loop:

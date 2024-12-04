@@ -1,0 +1,8 @@
+main:
+    irmovq $01,%r10     # Number 01
+    loop:
+        addq %rdi,%rax      # Adding rdi to final value rax
+        subq %r10,%rsi      # If (rsi - 1 >= 0)
+        jg loop             #    Jump to start of the loop
+    ret                 # Return       
+    
