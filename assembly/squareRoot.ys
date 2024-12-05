@@ -5,20 +5,20 @@ main:
     
     bit_to_larger:          # while (true)
         rrmovq %r10,%r11        # currentBit = bit
-        subq %r12,%r11          # if (bit <= num)
-        jg end_larger          #    break
+        subq %r12,%r11          # if (currentBit <= num)
+        jle end_larger          #    break
         call move_bit           # bit >>= 2
         jmp bit_to_larger
     end_larger:
 
     square_loop:          # while (true)
         rrmovq %r10,%r11        # currentBit = bit
-        andq %r11,%r11          # if (bit == 0)
+        andq %r11,%r11          # if (currentBit == 0)
         je end_square           #    break
         rrmovq %r10,%r11        # currentBit = bit
         addq %rcx,%r11          # currentBit += result
         subq %r12,%r11          # if (num >= currentBit + result)
-        jl is_bigger            #    jump to is_bigger
+        jge is_bigger            #    jump to is_bigger
                                 # else
             rrmovq %rcx,%rdi        # %rdi = result
             irmovq $10,%rsi         # %rsi = 10
