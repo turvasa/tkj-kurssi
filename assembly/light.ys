@@ -1,13 +1,15 @@
-main:               # lightness = 0.01 * (light_1 ^ 2) * light_2
+main:
+    irmovq stack,%rsp       # Initialize stack
     irmovq $0xf000,%r10     # mask_1 = f000
     irmovq $0x0fff,%r11     # mask_2 = 0fff
+    rrmovq %r13,%r14        # resgister = %r13
     andq %r11,%r13          # light_2 = register & mask_2
     andq %r10,%r14          # light_1 = register & mask_1
     rrmovq %r14,%rdi        # %rdi = light_1
     irmovq $0x1000,%rsi     # %rsi = 1000
     call division           # light_1 >> 12
     rrmovq %rax,%r14        # light_1 = %rax
-
+    halt
 
 
 division:           # %rax = %rdi / %rsi
@@ -20,4 +22,8 @@ division:           # %rax = %rdi / %rsi
         addq %r10,%rax      # Count++
         jmp division_loop   # Back to loop
     end_loop:           # end_loop
+    addq %r10,%rax      # Count++
     ret                 # Return
+
+.pos 0x400
+stack:

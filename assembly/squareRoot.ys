@@ -1,0 +1,63 @@
+main:
+    irmovq stack,%rsp       # Initialize stack
+    irmovq $00,%rcx         # result = 0
+    irmovq $0x10000,%r10    # bit = 0x10000
+    
+    bit_to_larger:          # while (true)
+        rrmovq %r10,%r11        # currentBit = bit
+        subq %r12,%r11          # if (bit <= num)
+        jg end_larger          #    break
+        call move_bit           # bit >>= 2
+        jmp bit_to_larger
+    end_larger:
+
+    square_loop:          # while (true)
+        rrmovq %r10,%r11        # currentBit = bit
+        andq %r11,%r11          # if (bit == 0)
+        je end_square           #    break
+        rrmovq %r10,%r11        # currentBit = bit
+        addq %rcx,%r11          # currentBit += result
+        subq %r12,%r11          # if (num >= currentBit + result)
+        jl is_bigger            #    jump to is_bigger
+                                # else
+            rrmovq %rcx,%rdi        # %rdi = result
+            irmovq $10,%rsi         # %rsi = 10
+            call division           # division = result >> 1
+            rrmovq %rax,%rcx        # result = division
+            call move_bit           # bit >>= 2
+            jmp square_loop
+        is_bigger:
+            subq %r11,%r12          # num -= currentBit + result
+            rrmovq %rcx,%rdi        # %rdi = result
+            irmovq $10,%rsi         # %rsi = 10
+            call division           # division = result >> 1
+            rrmovq %rax,%rcx        # result = division
+            addq %r10,%rcx          # result += bit
+            call move_bit           # bit >>= 2
+            jmp square_loop
+    end_square:
+
+
+move_bit:           # bit >> 2
+    rrmovq %r10,%rdi        # %rdi = bit
+    irmovq $100,%rsi        # %rsi = 100
+    call division           # division = bit >> 2
+    rrmovq %rax,%r10        # bit = division
+    ret
+
+
+division:           # %rax = %rdi / %rsi
+    irmovq $01,%r10     # Number 01
+    division_loop:      # loop
+        subq %rsi,%rdi      # If ((rdi - rsi) > 0)
+        jg add_count        #    Jump to add_count
+        jmp end_loop        # Jump to end_loop
+    add_count:          # add_count
+        addq %r10,%rax      # Count++
+        jmp division_loop   # Back to loop
+    end_loop:           # end_loop
+    addq %r10,%rax      # Count++
+    ret                 # Return
+
+.pos 0x400
+stack:
