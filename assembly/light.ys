@@ -6,7 +6,7 @@ main:
     andq %r11,%r13          # light_2 = register & mask_2
     andq %r10,%r14          # light_1 = register & mask_1
     rrmovq %r14,%rdi        # %rdi = light_1
-    irmovq $0x1000,%rsi     # %rsi = 1000
+    irmovq $0x1000,%rsi     # %rsi = 0x1000
     call division           # light_1 >> 12
     rrmovq %rax,%r14        # light_1 = %rax
     halt
