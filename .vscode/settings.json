@@ -63,7 +63,8 @@
     "math.h": "c",
     "cstdint": "c",
     "stdbool.h": "c",
-    "stdint.h": "c"
+    "stdint.h": "c",
+    "wkjdbwEK.C": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

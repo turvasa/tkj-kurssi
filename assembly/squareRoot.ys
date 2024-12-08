@@ -1,6 +1,3 @@
-.pos 0
-    irmovq $1024,%r12
-
 main:
     irmovq stack,%rsp       # Initialize stack
     irmovq $00,%rcx         # result = 0
@@ -10,7 +7,7 @@ main:
         rrmovq %r10,%r11        # currentBit = bit
         subq %r12,%r11          # if (currentBit <= num)
         jle end_grow            #    break
-        call move_bit           # bit >> 6
+        call move_bit                # bit >> 2
         jmp grow_bit
     end_grow:
 
@@ -22,37 +19,43 @@ main:
         subq %r12,%r11          # if (num >= newBit)
         jle is_bigger           #    jump to is_bigger
                                 # else
-            call move_result        # result >> 3
-            call move_bit           # bit >> 6
+            call move_result        # result >> 1
+            call move_bit           # bit >> 2
             jmp square_loop
         is_bigger:
             rrmovq %r10,%r11        # currentBit = bit
             addq %rcx,%r11          # newBit = currentBit + result
             subq %r11,%r12          # num -= newBit
-            call move_result        # result >> 3
+            call move_result        # result >> 1
             addq %r10,%rcx          # result += bit
-            call move_bit           # bit >> 6
+            call move_bit           # bit >> 2
             jmp square_loop
     end_square:
     halt
 
 
-move_bit:           # bit >> 6
+move_bit:           # bit >> 2
     rrmovq %r10,%rdi        # %rdi = bit
-    irmovq $64,%rsi          # %rsi = 0x100
-    call division           # division = bit >> 2
+    irmovq $32,%rsi         # %rsi = 32 (= 4 * 2^3)
+    call division           # division = bit >> 5
     rrmovq %rax,%r10        # bit = division
+    addq %r10,%r10
+    addq %r10,%r10
+    addq %r10,%r10          # bit *= 2^3 (bit << 3)
     ret
 
 
-move_result:        # result >> 3
+move_result:        # result >> 1
     rrmovq %rcx,%rdi        # %rdi = result
-    irmovq $8,%rsi          # %rsi = 0x10
-    call division           # division = result >> 1
+    irmovq $16,%rsi          # %rsi = 16 (= 2 * 2 ^ 3)
+    call division           # division = result >> 4
     rrmovq %rax,%rcx        # result = division
+    addq %r10,%r10
+    addq %r10,%r10
+    addq %r10,%r10          # bit *= 2^3
     ret
-
-
+    
+    
 division:           # %rax = %rdi / %rsi
     andq %rdi,%rdi      # if (%rdi == 0)
     je end_loop         #    break
@@ -67,6 +70,16 @@ division:           # %rax = %rdi / %rsi
         jmp division_loop   # Back to loop
     end_loop:           # end_loop
     ret                 # Return
+
+
+multiplication:     # %rax = %rdi * %rsi
+    irmovq $01,%r14     # Number 01
+    loop:
+        addq %rdi,%rax      # Adding rdi to final value rax
+        subq %r14,%rsi      # If (rsi - 1 >= 0)
+        jg loop             #    Jump to start of the loop
+    ret                 # Return       
+    
 
 
 .pos 0x400
