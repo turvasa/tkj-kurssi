@@ -24,7 +24,7 @@ main:
     irmovq $65536, %r14     # 65 536
     pushq %r14
 
-    rrmovq %rsp,%r10        # bit = top value of stack
+    popq %r10               # bit = top value of stack
     irmovq $01,%r14         # consant 1
     irmovq $08,%r8          # consant 8
     
@@ -35,19 +35,18 @@ main:
         andq %r11,%r11          # if (currentBit == 0)
         je end_square           #    break
         addq %rcx,%r11          # newBit = currentBit + result
+        rrmovq %r11,%r13        # currentNewBit = newBit
         subq %r12,%r11          # if (num >= newBit)
         jle is_bigger           #    jump to is_bigger
                                 # else
             call move_result        # result >> 1
             jmp bit_shift
         is_bigger:
-            rrmovq %r10,%r11        # currentBit = bit
-            addq %rcx,%r11          # newBit = currentBit + result
-            subq %r11,%r12          # num -= newBit
+            subq %r13,%r12          # num -= currentNewBit
             call move_result        # result >> 1
             addq %r10,%rcx          # result += bit
         bit_shift:
-            popq %r10               # bit =  >> 2
+            popq %r10               # bit = >> 2
             jmp square_loop
     end_square:
     halt
@@ -65,6 +64,13 @@ move_bit:
 
 
 move_result:        # result >> 1
+    rrmovq %rcx,%rdi        # %rdi = result
+    irmovq $02,%rsi         # %rsi = 2
+    call division           # division = rdi / rsi
+    rrmovq %rax,%rcx        # result = division (result >> 1)
+    ret
+
+    
     rrmovq %rcx,%rax        # currentResult = result
     irmovq $00,%rdi         # bitResult = 0
     irmovq $63,%rsi         # bitsToShift = 64 - 1
@@ -92,7 +98,6 @@ division:     # %rax = %rdi / %rsi
         jmp loop            # Back to loop
     end_loop:           # end_loop
     ret                 # Return
-
 
 
 .pos 0x400
