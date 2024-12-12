@@ -1,33 +1,33 @@
 main:   # %rax = %r11 * %r12
     irmovq stack,%rsp       # Initialize stack
     irmovq $01,%r10             # one = 1
-    irmovq $0x01,%r9            # bit = 0b01
+    irmovq $0x01,%r9            # bit = 0x01
     irmovq $01,%r8              # count = 1
+
     call make_multiplier_smaller
 
     multi_loop:                 # while (true)
         rrmovq %r12,%r13        # multi = multiplier
-        subq %r8,%r13           # if (multi == 0)
+        subq %r10,%r13          # if (multi == 0)
         jl end_multi            #    break
 
         rrmovq %r12,%r13        # multi = multiplier
         andq %r9,%r13           # if ((mulit & 0b01) == 0)
         je skip_multi           #    skip_multi
 
-        rrmovq %r12,%rdi        # multi = multiplier
+        rrmovq %r11,%rdi        # multic = multiplicand
         rrmovq %r8,%rsi         # countCpy = count
-        call result_shift       # multi << count
-        addq %rdi,%rax          # result += multi
+        jmp multiplicand_shift # multic << count
+        end_shift:
+        addq %rdi,%rax          # result += multic
 
     skip_multi:
         call move_multiplier    # multiplier >> 1
+        addq %r10,%r8           # count++
         jmp multi_loop
-
 
     end_multi:
     halt
-
-
 
 
 make_multiplier_smaller:    # %r11 <-> %r12, if %r12 > %r11
@@ -42,14 +42,12 @@ skip_change:
     ret
 
 
-result_shift:     # multi << count
+multiplicand_shift:     # multi << count
     shift_loop:              # while (true)
         subq %r10,%rsi          # if (count-- == 0)
-        jl end_shift            #    break
+        je end_shift            #    break
         addq %rdi,%rdi          # multi << 1
         jmp shift_loop
-    end_shift:
-        ret
 
 
 move_multiplier:        # multiplier >> 1
