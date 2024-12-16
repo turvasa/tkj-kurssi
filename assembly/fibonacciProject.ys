@@ -1,0 +1,294 @@
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
+main:
+    irmovq stack,%rsp       # Initialize stack
+    irmovq $01,%r10         # Constant 1
+
+    array_search:           # while (true)
+        mrmovq (%r11),%rax      # Get arrayNum from array
+        irmovq $08,%r8          # Constant 8
+        addq %r8,%r11           # Move %r11 to next index inarray
+        rrmovq %rax,%rdx        # numCpy = arrayNum
+
+        # Is list fully checked (last value is always 0)
+            andq %rdx,%rdx          # if (numCpy == 0)
+            je end_search           #    end_search
+
+
+        # Check: 5 * (arrayNum ** 2) + 4
+
+            rrmovq %rax,%rcx        # arrayNumCpy = arrayNum
+
+            # arrayNum **= 2
+                rrmovq %rcx,%rdx        # numCpy = arrayNumCpy
+                rrmovq %rcx,%r12        # numCpy = arrayNumCpy
+                call multiplication     # arrayNumCpy *= arrayNumCpy
+
+            # arrayNum *= 5
+                rrmovq %rcx,%rdx        # numCpy = arrayNumCpy
+                irmovq $05,%r12         # Constant 5
+                call multiplication     # arrayNumCpy *= 5
+
+            # arrayNum += 4
+                irmovq $04,%r12         # Constant 4
+                addq %r12,%rcx          # arrayNumCpy += 4
+
+            call is_perfect_square      # Check is arrayNumCpy is perfect square
+            
+            # If arrayNum is perfect square, go to next number, else continue checking
+                andq %rax,%rax          # if (arrayNum == 0)
+                je array_search         #    check next number
+
+        # Check: 5 * (arrayNum ** 2) - 4
+
+            rrmovq %rax,%rcx        # arrayNumCpy = arrayNum
+
+            # arrayNum **= 2
+                rrmovq %rcx,%rdx        # numCpy = arrayNumCpy
+                rrmovq %rcx,%r12        # numCpy = arrayNumCpy
+                call multiplication     # arrayNumCpy *= arrayNumCpy
+
+            # arrayNum *= 5
+                rrmovq %rcx,%rdx        # numCpy = arrayNumCpy
+                irmovq $05,%r12         # Constant 5
+                call multiplication     # arrayNumCpy *= 5
+
+            # arrayNum -= 4
+                irmovq $04,%r12         # Constant 4
+                subq %r12,%rcx          # arrayNumCpy -= 4
+
+            call is_perfect_square      # Check is arrayNumCpy is perfect square
+            
+            # If arrayNum is perfect square, go to next number, else end search
+                andq %rax,%rax          # if (arrayNum == 0)
+                je array_search         #    check next number
+
+    end_search:
+    halt
+
+
+
+
+
+
+# Check is %rcx a fibonacci number
+# Return: the given arrayNum in %rcx to %rax, if arrayNum is not perfect square
+# else continue checking
+
+    is_perfect_square:
+
+        rrmovq %rcx,%rbx        # ogParam = param
+
+        # square = sqrt(param)
+            rrmovq %rcx,%r12    # paramCpy = param
+            jmp square_root     # square = sqrt(paramCpy)
+            end_square_root:
+
+        # power_two = square ** 2
+            rrmovq %rcx,%rdx        # squareCpy = square
+            rrmovq %rcx,%r12        # squareCpy = square
+            call multiplication     # square *= square
+
+        # Is power_two == param (= %rax)
+            subq %rbx,%rcx          # if ((sqrt(param)) ** 2 != ogParam)
+            jne not_perfect         #    param is not perfect square
+            
+            xorq %rax,%rax              # arrayNum = 0
+
+        not_perfect:
+    
+    ret                     # Return
+
+
+
+
+
+
+
+
+# Calculate: %rcx = %rdx * %r12
+
+    multiplication:
+        irmovq $0x01,%r9            # bit = 0x01
+        irmovq $01,%r8              # count = 1
+        xorq %rcx,%rcx              # result = 0
+
+        call make_multiplier_smaller
+
+    multi_loop:             # while (true)
+        rrmovq %r12,%r13        # multiplierCpy = multiplier
+
+        andq %r9,%r13           # if ((multiplierCpy & 0b01) == 0)
+        je skip_add             #    skip_add
+
+        rrmovq %rdx,%rdi        # multiplicandCpy = multiplicand
+        rrmovq %r8,%rsi         # countCpy = count
+        call multiplicand_shift # multiplidandCpy << count
+        addq %rdi,%rcx          # reslut += multi
+
+    skip_add:
+        addq %r9,%r9            # bit << 1
+        addq %r10,%r8           # count++
+        rrmovq %r12,%r13        # multiplierCpy = multiplier
+        subq %r9,%r13           # if (multiplierCpy < bit)
+        jge multi_loop          #    break  
+
+    ret                     # Return
+
+
+    # If %r12 > %rdx, change the values between each others
+    # This will make the multiplication algorithm more efficient
+
+        make_multiplier_smaller:
+            rrmovq %r12,%r14            # multiplierCpy = multiplier
+
+            subq %rdx,%r14              # if (multiplierCpy <= multiplicand)
+            jle skip_change             #    skip_change
+
+            rrmovq %r12,%r14            # multiplierCpy = multiplier
+            rrmovq %rdx,%r12            # multiplier = multiplicand
+            rrmovq %r14,%rdx            # multiplicand = multiplierCpy
+        skip_change:
+    
+    ret                     # Return
+
+
+    multiplicand_shift:     # multi << count
+        shift_loop:              # while (true)
+            subq %r10,%rsi          # if (count-- == 0)
+            je end_shift            #    break
+            addq %rdi,%rdi          # multi << 1
+            jmp shift_loop
+        end_shift:
+    
+    ret                     # Return
+
+
+
+
+
+
+# Calculate: %rcx = sqrt(%r12)
+
+    square_root:
+        irmovq $00,%rcx         # result = 0
+
+        # Fill stack with bit values 2^(2n)
+        # Largest possible value in %r12 = 1000^2 * 5 + 4 = 5 000 004 < 2^24
+            irmovq $0, %r14         # 0
+            pushq %r14
+            irmovq $1, %r14         # 2^0  = 1
+            pushq %r14
+            irmovq $4, %r14         # 2^2  = 4
+            pushq %r14
+            irmovq $16, %r14        # 2^4  = 16
+            pushq %r14
+            irmovq $64, %r14        # 2^6  = 64
+            pushq %r14
+            irmovq $256, %r14       # 2^8  = 256
+            pushq %r14
+            irmovq $1024, %r14      # 2^10 = 1 024
+            pushq %r14
+            irmovq $4096, %r14      # 2^12 = 4 096
+            pushq %r14
+            irmovq $16384, %r14     # 2^14 = 16 384
+            pushq %r14
+            irmovq $65536, %r14     # 2^16 = 65 536
+            pushq %r14
+            irmovq $262144, %r14    # 2^18 = 262 144
+            pushq %r14
+            irmovq $1048576, %r14   # 2^20 = 1 048 576
+            pushq %r14
+            irmovq $4194304, %r14   # 2^22 = 4 194 304
+            pushq %r14
+            irmovq $16777216, %r14  # 2^24 = 16 777 216
+            pushq %r14
+
+        popq %r14               # bit = top value of stack
+
+        jmp move_bit            # Make bit < num
+
+        square_loop:            # while (true)
+
+            # Is bit zero
+                andq %r14,%r14          # if (bit == 0)
+                je end_square           #    break
+
+            rrmovq %rcx,%rdx        # temp = result
+            addq %r14,%rdx          # temp += bit
+            rrmovq %rdx,%r13        # tempCpy = temp
+            subq %r12,%rdx          # if (temp > num)
+            jg larger               #    Jump to larger
+
+            # Update bit, num and result
+                subq %r13,%r12          # num -= tempCpy
+                call move_result        # result >> 1
+                addq %r14,%rcx          # result += bit
+                popq %r14               # bit >> 2
+                jmp square_loop
+
+            # Update bit and result
+                larger:
+                    call move_result        # result >> 1
+                    popq %r14               # bit >> 2
+                    jmp square_loop
+        end_square:
+        jmp end_square_root         # Square root is calculated
+
+
+    # Do: bit >> 2, until bit < num
+        move_bit:
+            get_bit:                # while (true)
+                rrmovq %r14,%rdx        # currentBit = value on stack
+                subq %r12,%rdx          # if (currentBit <= num)
+                jle end_get             #    break
+                popq %r14               # bit =  >> 2
+                jmp get_bit
+            end_get:
+            jmp square_loop
+
+
+    # result >> 1
+        move_result:
+            rrmovq %rcx,%rbp        # currentResult = result
+            irmovq $00,%rdi         # bitResult = 0
+            irmovq $63,%rsi         # bitsToShift = 64 - 1
+
+            result_loop:            # while (true)
+                addq %rdi,%rdi          # bitResult << 1
+                andq %rbp,%rbp          # if (currentResult >= 0)
+                jge shift               #    jump to shift
+                xorq %r10,%rdi          # bitResult ^= 1
+            shift:
+                addq %rbp,%rbp          # currentResult << 1
+                subq %r10,%rsi          # if (bitsToShift-- < 0)
+                jne result_loop         #    continue
+                rrmovq %rdi,%rcx        # result = bitResult
+                
+        ret                     # Return
+
+
+
+
+
+
+.pos 0x400
+stack:
+
+.pos 0x700
+array:
