@@ -1,0 +1,53 @@
+main:   # %rax = %r11 * %r12
+    irmovq stack,%rsp           # Initialize stack
+    irmovq $01,%r10             # one = 1
+    irmovq $0x01,%r9            # bit = 0x01
+    irmovq $01,%r8              # count = 1
+    xorq %rax,%rax              # result = 0
+
+    call make_multiplier_smaller
+
+multi_loop:             # while (true)
+    rrmovq %r12,%r13        # multi = multiplier
+    andq %r9,%r13           # if ((mulit & 0b01) == 0)
+    je skip_add             #    skip_add
+
+    rrmovq %r11,%rdi        # multi = multiplicand
+    rrmovq %r8,%rsi         # countCpy = count
+    call multiplicand_shift # multi << count
+    addq %rdi,%rax          # reslut += multi
+
+skip_add:
+    addq %r9,%r9            # bit << 1
+    addq %r10,%r8           # count++
+    rrmovq %r12,%r13        # multi = multiplier
+    subq %r9,%r13           # if (multi < bit)
+    jge multi_loop          #    break        
+
+halt                   # Terminate program
+
+
+make_multiplier_smaller:    # %r11 <-> %r12, if %r12 > %r11
+    rrmovq %r12,%r14            # multiplierCpy = multiplier
+    subq %r11,%r14              # if (multiplierCpy <= multiplicand)
+    jle skip_change             #    skip_change
+
+    rrmovq %r12,%r14            # multiplierCpy = multiplier
+    rrmovq %r11,%r12            # multiplier = multiplicand
+    rrmovq %r14,%r11            # multiplicand = multiplierCpy
+skip_change:
+    ret
+
+
+multiplicand_shift:     # multi << count
+    shift_loop:              # while (true)
+        subq %r10,%rsi          # if (count-- == 0)
+        je end_shift            #    break
+        addq %rdi,%rdi          # multi << 1
+        jmp shift_loop
+    end_shift:
+        ret
+
+
+.pos 0x800
+stack:
