@@ -29,9 +29,7 @@ main:
             andq %rdx,%rdx          # if (numCpy == 0)
             je end_search           #    end_search
 
-
         # Check: 5 * (arrayNum ** 2) + 4
-
             rrmovq %rax,%rcx        # arrayNumCpy = arrayNum
 
             # arrayNum **= 2
@@ -55,7 +53,6 @@ main:
                 je array_search         #    check next number
 
         # Check: 5 * (arrayNum ** 2) - 4
-
             rrmovq %rax,%rcx        # arrayNumCpy = arrayNum
 
             # arrayNum **= 2
