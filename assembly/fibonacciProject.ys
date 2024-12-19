@@ -1,26 +1,38 @@
 # Tatu Tallavaara, ID: 2208317
 #
 # I'm calulating commands by counting the lines and for simplicity getting the average
-# (if necessary). Example line count is different when bit is 1 than being a 0 in multiplication.
+# (if necessary). For example line count is different when bit is 1 than being a 0 in multiplication,
+# so I would count the lines with for bit = 1 and bit = 0 separetly and calculating the average (probability
+# is roughly 50%). The formulas are well simplified for the sake of an eye candy.
 #
 # Average command estimates:
 #   Multiplication (n = multiplier a.k.a. %r12): 
-#       5 + n(9 + 3/2n)
+#       commands ≈ 5 + n(9 + 3/2n)
 #
-#   Square root (2^n < num a.k.a. %r12 and m = 24 - n): 
-#       31 + 4m + 324n
+#   Square root (n: 2^n < num a.k.a. %r12 and m = 24 - n): 
+#       commands ≈ 31 + m(4 + 324n)
 #
-#   Whole project (n = list lenght to non fibonacci number, m = current list num, 
-#                  multi = multiplication commands, sqrt = square root commands):
-#       2 + n(27 + 3/2*(3multi + sqrt))
+#   Whole project (n = list lenght from 0 to non fibonacci number, multi = multiplication commands, 
+#                  sqrt = square root commands):
+#       commands ≈ 2 + n(27 + 3/2*(3multi + sqrt))
 #
+# Peasant multiplication is like day and night comparing to normal one, which
+# was easily noticed in smaller task, for example 1337 * 7331 took 266 commands with
+# Peasant while normal algorithm would have taken 1+3*1337 = 4012 commands.
 #
+# Bit shift to left is most efficient to hadle with addq, so the num is added to it self, because
+# one bit shift means multiplicating the num by 2.
 #
+# Most of the optimization was done in the square root and efficient multiplication in the smaller tasks.
+# Only thing that I changed in them to fibonacci was sqapping the smaller value to multiplier in multiplication.
+# However I haven't tested the non optimaized version, so I don't have any idea how magnificent differenxe it was,
+# but I'm sure it would have been noticeable one.
 #
-#
-#
-#
-#
+# Mostly this project went smoothly. Only difficult part was to get all register to be in sync with multiplication
+# and square root, because they were previously made. This took several hours (I could have used memory positions, 
+# but I just didn'taken that at the time). I also had some minor mistakes, that were captured with the online 
+# simulator without much effort. The register issue would have been lesser, if all the part would be made to be 
+# part of the project fro the beginning.
 #
 
 
@@ -262,7 +274,7 @@ main:
                 rrmovq %rdx,%r13        # tempCpy = temp
 
                 subq %r12,%rdx          # if (tempCpy <= num)
-                jle larger               #    Jump to num_is_larger
+                jle num_is_larger       #    Jump to num_is_larger
 
             # num is smaller: update bit and result
                 call move_result        # result >> 1
