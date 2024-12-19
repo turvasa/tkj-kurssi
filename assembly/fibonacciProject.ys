@@ -28,11 +28,12 @@
 # However I haven't tested the non optimaized version, so I don't have any idea how magnificent differenxe it was,
 # but I'm sure it would have been noticeable one.
 #
-# Mostly this project went smoothly. Only difficult part was to get all register to be in sync with multiplication
-# and square root, because they were previously made. This took several hours (I could have used memory positions, 
-# but I just didn'taken that at the time). I also had some minor mistakes, that were captured with the online 
-# simulator without much effort. The register issue would have been lesser, if all the part would be made to be 
-# part of the project fro the beginning.
+# Mostly this project went smoothly, because I think all the hard functions were already done by this point. Only 
+# difficult part was to get all register to be in sync with multiplication and square root, because they were 
+# previously made. This took several hours (I could have used memory positions, but I just didn't realize that at    
+# the time). The register issue would have been lesser, if all the implementations would be made to be part of the 
+# whole project from the beginning. I also had some minor mistakes, that were captured with the online simulator 
+# without much effort.
 #
 
 
